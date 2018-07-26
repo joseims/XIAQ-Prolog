@@ -1,6 +1,13 @@
 :- initialization(main).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               RANKING                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               GERADOR                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -22,7 +29,7 @@ batalha(HA, HL, EA, EL, Coin, Res) :- EL / HA > HL / EA -> Res is 0;
     Res is Coin.
 
 fluxo_batalha(HA, HL, Coin, Round, Exp) :-
-    gerar_inimigo(Exp)
+    gerar_inimigo(Exp).
 
 inicio_batalha() :-
     gerar_heroi(HA, HL),
