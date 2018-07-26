@@ -1,17 +1,39 @@
+:- use_module(library(random)).
+
 :- initialization(main).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                LOJA                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RANKING                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+inserePontuacao(pontuacao, origem, [pontuacao|origem]). 
+ordenaRanking(ranking,ordenado) :- sort(ranking, ordenado).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                             GERADOR ITEM                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
+%! Seleciona um item aleatoriamente
+
+getItem([H|T], 0, H). 
+getItem([H|T], Numero, Item) :-  K is Numero -1, getItem(T, K, Item).
+
+%! armas
+
+armas(arma) :- Inventario = ["Espada", "Bastao", "Manopla", "Espada e Escudo"], random(0,3,X), getItem(Inventario, X, arma).
+
+%! armaduras
+
+armaduras(armadura) :- Inventario = ["Armadura Leve", "Armadura Media", "Armadura Pesada", "Armadura Espinhosa", "Kimono"], random(0,3,X), getItem(Inventario, X, armadura). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               GERADOR                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
