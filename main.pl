@@ -18,10 +18,14 @@ ordenaRanking(ranking,ordenado) :- sort(ranking, ordenado).
 %                             GERADOR ITEM                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
+randomizeArma(Str, Hp, Price, Name, Alterador) :- armas(K), alterador(A), J is append(K, A, X), Str is random(20), Hp is random(20), Price is random(15), armaGerada = (Str, Hp, Price, J).   
+
+randomizeArmadura(Str, Hp, Price, Name, Alterador) :- armaduras(K), alterador(A), J is append(K, A, X), Str is random(20), Hp is random(20), Price is random(15), armaduraGerada = (Str, Hp, Price, J). 
+
 %! Seleciona um item aleatoriamente
 
 getItem([H|T], 0, H). 
-getItem([H|T], Numero, Item) :-  K is Numero -1, getItem(T, K, Item).
+getItem([H|T], Numero, Item) :-  K is Numero - 1, getItem(T, K, Item).
 
 %! armas
 
@@ -30,6 +34,10 @@ armas(arma) :- Inventario = ["Espada", "Bastao", "Manopla", "Espada e Escudo"], 
 %! armaduras
 
 armaduras(armadura) :- Inventario = ["Armadura Leve", "Armadura Media", "Armadura Pesada", "Armadura Espinhosa", "Kimono"], random(0,3,X), getItem(Inventario, X, armadura). 
+
+%! alterer
+
+alterador(alterer) :- Alteradores = [" Furioso", " Brilhante"," Resistente"," Lendario"," Irreparavel"," Fraco"," Sujo"," Macio", ""], random(0,8,X), getItem(Alteradores,X,alterer). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               GERADOR                              %
