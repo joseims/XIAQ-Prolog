@@ -42,8 +42,8 @@ operacao(_, W, A, HA, HL, Res) :-
 %                               RANKING                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-inserePontuacao(pontuacao, origem, [pontuacao|origem]). 
-ordenaRanking(ranking,ordenado) :- sort(ranking, ordenado).
+inserePontuacao(Pontuacao, Origem, [Pontuacao|Origem]). 
+ordenaRanking(Ranking,Ordenado) :- sort(Ranking, Ordenado).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             GERADOR ITEM                           %
