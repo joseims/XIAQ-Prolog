@@ -1,6 +1,6 @@
 :- use_module(library(random)).
 
-%:- initialization(main).
+:- initialization(main).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                LOJA                                %
@@ -53,34 +53,56 @@ gerar_item(STR, HP, I) :-
 %                             GERADOR MONSTRO                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 getItem([H|T], 0, H). 
-getItem([H|T], Numero, Item) :-  K is Numero - 1, getItem(T, K, Item).
+getItem([H|T], Numero, Item) :- 
+	K is Numero - 1, 
+	getItem(T, K, Item).
 
+monstro(Name) :- 
+	nomeMonstro(X), 
+	alteradorMonstro(Y), 
+	string_concat(X, Y, Name).
 
+nomeMonstro(Nome) :- 
+	Monstros = ['Ladrão', 'Dragão', 'Golem', 'Gosma', 'Vampiro', 'Lobisomen', 'Rato gigante'],
+	random(0, 5, X), 
+	getItem(Monstros, X, Nome),!. 
 
-monstro(Name) :- nomeMonstro(X),alteradorMonstro(Y),string_concat(X,Y,Name).
+alteradorMonstro(Alterer) :- 
+	Alteradores = [' Pacifista', ' Burro', ' Cego', ' Imaginário', ' Sem Pernas', ' Invisivel', ' Gigantesco',
+    			   ' de 3 cabeças', ' Aterrorizante', ' Cabeludo', ' Rochoso', ' Assassino', ''], 
+    random(0, 11, X), 
+    getItem(Alteradores, X, Alterer),!. 
 
-nomeMonstro(Nome) :- Monstros = ['Ladrão','Dragão','Golem','Gosma', 'Vampiro','Lobisomen','Rato gigante'],
- random(0,5,X), getItem(Monstros, X, Nome),!. 
+aumentaAtributo(X,Y) :- 
+	Y is 1.05*X.
 
-alteradorMonstro(Alterer) :- Alteradores = [' Pacifista',' Burro',' Cego',' Imaginário',' Sem Pernas', ' Invisivel', ' Gigantesco',
-    ' de 3 cabeças', ' Aterrorizante',' Cabeludo',' Rochoso',' Assassino', ''], random(0,11,X), getItem(Alteradores,X,Alterer),!. 
+atualizar_inimigo(HP, ATQ, NewHP, NewATQ) :-
+    gera_hp(HP, NewHP), 
+    gera_atq(ATQ, NewATQ).
 
-aumentaAtributo(X,Y) :- Y is 1.5*X.
+gera_hp(HP, NewHP) :-
+    aumentaAtributo(HP, X),
+    random(0,5,Rand),
+    soma(Rand, X, NewHP).
 
-gerar_inimigo(HP, ATQ) :-
-    gera_hp(HP), gera_atq(ATQ).
+gera_atq(ATQ, NewATQ) :-
+    aumentaAtributo(ATQ, X),
+    random(0,5,Rand),
+    soma(Rand, X, NewATQ).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           GERADOR HEROI                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+gerar_heroi(HA, HL, 1) :- 
+	HA is 500, HL is 500.
 
-gera_hp(HP) :-
-    HP is 15.
+gerar_heroi(HA, HL, 2) :- 
+	HA is 250, HL is 250.
 
-gera_atq(ATQ) :-
-    ATQ is 15.
-
-
+gerar_heroi(HA, HL, _) :- 
+	HA is 100, HL is 100.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               BATALHA                              %
@@ -92,58 +114,62 @@ gera_atq(ATQ) :-
 % EL - Enemy Life
 % Coin - Coin Toss result
 % Res - Result, 1 the Hero wins, 0 the Enemy wins
-batalha(HA, HL, EA, EL, Coin, Res) :- EL / HA > HL / EA -> Res is 0;
+
+batalha(HA, HL, EA, EL, Coin, Res) :- 
+	EL / HA > HL / EA -> Res is 0;
     EL / HA < HL / EA -> Res is 1;
     Res is Coin.
 
-
-
-
-fluxo_batalha(HA, HL, Coin, Round) :-
+fluxo_batalha(HA, HL, EL, EA, Coin, Round) :-
     monstro(Nome),
-    write("Você encontrou um "),write(Nome),nl,
-    gerar_inimigo(EL,EA),
-    batalha(HA,HL,EA,EL,Coin,Res),
-    result(Res,HA,HL,Round).
+    write("Você encontrou um "), write(Nome), nl,
+    atualizar_inimigo(EL, EA, NewEL, NewEA),
+    batalha(HA, HL, NewEA, NewEL, Coin, Res),
+    result(Res, HA, HL, NewEA, NewEL, Round).
 
+result(Res, HA, HL, EA, EL, Round) :- 
+	Res = 1 -> ganhou(HA, HL, EA, EL, Round);
+	perdeu.
 
-result(Res,HA,HL,Round) :- Res = 1 -> ganhou(HA,HL,Round);perdeu.
-
-
-ganhou(HA,HL,Round) :- 
+ganhou(HA,HL,EA, EL, Round) :- 
     write("Parabens você ganhou a luta! Você venceu o Round "),
-    soma(1,Round,ProxRound),
-    write(Round),nl,
-    inicio_batalha(HA,HL,ProxRound).
+    soma(1, Round, ProxRound),
+    write(Round), nl, nl,
+    inicio_batalha(HA, HL, EA, EL, ProxRound).
 
 perdeu :- 
     writeln("Não foi dessa vez :("),
-     mensagem_inicial(), mensagem_batalha().
+    main.
 
-
-
-inicio_batalha(HA,HL,6):- 
+inicio_batalha(HA, HL, EA, EL, 6):- 
     writeln("Você venceu 5 batalhas consecutivas! Vá para a loja melhorar seus equipamentos"),
-    iniciar_loja(HA,HL,NewHA,NewHL),
-    inicio_batalha(NewHA,NewHL,0).
+    iniciar_loja(HA, HL, NewHA, NewHL),
+    inicio_batalha(NewHA, NewHL, EA, EL, 0).
 
-
-inicio_batalha(HA,HL,Round) :-
+inicio_batalha(HA, HL, EA, EL, Round) :-
     writeln("A batalha vai começar!"),
     coin(Res),
-    fluxo_batalha(HA, HL, Res, Round).
-
+    fluxo_batalha(HA, HL, EA,EL, Res, Round).
 
 jogo :-
-    gerar_heroi(HA,HL),
-    inicio_batalha(HA,HL,0).
+	seleciona_dificuldade(X),
+    gerar_heroi(HA, HL, X),
+    gerar_inimigo_base(EA, EL),
+    inicio_batalha(HA, HL, EA, EL, 0).
 
+seleciona_dificuldade(X) :-
+	write("Selecione a dificuldade:"), nl,
+	write("[1] Fácil"), nl,
+    write("[2] Médio"), nl,
+    write("[3] Difícil"), nl,
+    read(X), nl.
 
-
-
+gerar_inimigo_base(EA, EL) :- 
+	EA is 15, 
+	EL is 15.
 
 ck(Res) :-
-    random(0,2,Res),
+    random(0, 2, Res),
     msg_ck(Res).
 
 msg_ck(1) :- 
@@ -152,35 +178,32 @@ msg_ck(1) :-
 msg_ck(0) :- 
     writeln("O resultado foi coroa! :(").
 
-
-
 coin(Resultado) :- 
     write("Vamos decidir quem começa em um Cara ou Coroa"), nl,
-    write("Cara você ganha, Coroa você perde"),nl,
+    write("Cara você ganha, Coroa você perde"), nl,
     ck(Resultado).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                               HEROI                                %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-gerar_heroi(HA,HL):-
-HA is 25, HL is 25.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                MENU                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-redireciona(1) :- jogo.
-redireciona(2) :- ver_instrucoes().
-redireciona(3) :- ver_recordes().
-redireciona(4) :- sair().
-redireciona(_) :- 
+sair.
 
+ver_instrucoes :- 
+	writeln("O jogo se dá através de sucessivas lutas contra monstros!"), 
+	writeln("A cada 5 vitórias você poderá ir para loja ficar mais forte!"),
+	writeln("Dê o seu melhor para obter o maior numero de pontos possíveis!"), nl,
+	main.
+
+redireciona(1) :- jogo.
+redireciona(2) :- ver_instrucoes.
+redireciona(3) :- ver_recordes.
+redireciona(4) :- sair.
+redireciona(_) :- 
     write("Entrada Inválida. Insira outro valor."), nl,
     mensagem_batalha().
 
-mensagem_inicial :- write("Bem Vindo ao XIAQ"), nl.
+mensagem_inicial :- nl, write("Bem Vindo ao XIAQ"), nl.
 mensagem_batalha :- 
     write("[1] Iniciar batalha"), nl,
     write("[2] Ver Instruções"), nl,
