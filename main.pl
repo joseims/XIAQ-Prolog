@@ -6,6 +6,32 @@
 %                                LOJA                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+iniciar_loja(HA, HL, NewHA, NewHL) :-
+    gerar_item(HA, HL, W),
+    gerar_item(HA, HL, A),
+    mensagem_loja(W, A, HA, HL, Res),
+    (X, Y) = Res,
+    NewHA is X, NewHL is Y.
+
+mensagem_loja(W, A, HA, HL, Res) :- 
+    write("Bem Vindo à Loja"), nl,
+    write("Qual item você deseja comprar?"), nl,
+    write("[1] Arma     "), write(W), nl,
+    write("[2] Armadura "), write(A), nl,
+    write("[3] Não vou comprar nada"), nl, nl,
+    ler_inteiro(Num), nl, operacao(Num, W, A, HA, HL, Res).
+
+ler_inteiro(X) :-
+    read_line_to_codes(user_input, Codes),
+    string_to_atom(Codes, Atom),
+    atom_number(Atom, X).
+
+operacao(1, W, A, HA, HL, W).
+operacao(2, W, A, HA, HL, A).
+operacao(3, W, A, HA, HL, (HA, HL)).
+operacao(_, W, A, HA, HL, Res) :-
+    write("Entrada Inválida. Insira outro valor."), nl,
+    mensagem_loja(W, A, HA, HL, Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RANKING                              %
@@ -18,27 +44,15 @@ ordenaRanking(ranking,ordenado) :- sort(ranking, ordenado).
 %                             GERADOR ITEM                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-randomizeArma(Str, Hp, Price, Name, Alterador) :- armas(K), alterador(A), J is append(K, A, X), Str is random(20), Hp is random(20), Price is random(15), armaGerada = (Str, Hp, Price, J).   
+soma(X, Y, Res) :- Res is X + Y.
 
-randomizeArmadura(Str, Hp, Price, Name, Alterador) :- armaduras(K), alterador(A), J is append(K, A, X), Str is random(20), Hp is random(20), Price is random(15), armaduraGerada = (Str, Hp, Price, J). 
-
-%! Seleciona um item aleatoriamente
-
-getItem([H|T], 0, H). 
-getItem([H|T], Numero, Item) :-  K is Numero - 1, getItem(T, K, Item).
-
-%! armas
-
-armas(arma) :- Inventario = ["Espada", "Bastao", "Manopla", "Espada e Escudo"], random(0,3,X), getItem(Inventario, X, arma).
-
-%! armaduras
-
-armaduras(armadura) :- Inventario = ["Armadura Leve", "Armadura Media", "Armadura Pesada", "Armadura Espinhosa", "Kimono"], random(0,3,X), getItem(Inventario, X, armadura). 
-
-%! alterer
-
-alterador(alterer) :- Alteradores = [" Furioso", " Brilhante"," Resistente"," Lendario"," Irreparavel"," Fraco"," Sujo"," Macio", ""], random(0,8,X), getItem(Alteradores,X,alterer). 
-
+gerar_item(STR, HP, I) :-
+    soma(STR, 20, MaxSTR),
+    soma(HP, 20, MaxHP),
+    random(STR, MaxSTR, NewSTR),
+    random(HP, MaxHP, NewHP),
+    I = (NewSTR, NewHP).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               GERADOR                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
