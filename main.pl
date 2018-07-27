@@ -97,3 +97,13 @@ mensagem_batalha() :-
     read(Entrada), nl, redireciona(Entrada).
 
 main :- mensagem_inicial(), mensagem_batalha().
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                Log                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+log(Text) :-
+	open('log.txt', append, Stream),
+	write(Stream, Text), nl,
+	close(Stream).
