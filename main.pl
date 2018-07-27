@@ -13,20 +13,29 @@ iniciar_loja(HA, HL, NewHA, NewHL) :-
     (X, Y) = Res,
     NewHA is X, NewHL is Y.
 
-mensagem_loja(W, A, HA, HL, Res) :- 
-    write("Bem Vindo à Loja"), nl,
-    write("Qual item você deseja comprar?"), nl,
-    write("[1] Arma     "), write(W), nl,
-    write("[2] Armadura "), write(A), nl,
-    write("[3] Não vou comprar nada"), nl, nl,
-    read(Num), nl, operacao(Num, W, A, HA, HL, Res).
+mensagem_loja(W, A, HA, HL, Res) :-
+    Msg1 = "Bem Vindo à Loja",
+    Msg2 = "Qual item você deseja comprar?",
+    Msg3 = "[1] Arma     ",
+    Msg4 = "[2] Armadura ",
+    Msg5 = "[3] Não vou comprar nada",
+    write(Msg1), log(Msg1), log("\n"), nl,
+    write(Msg2), log(Msg2), log("\n"), nl,
+    write(Msg3), log(Msg3),
+    write(W), log(W), log("\n"), nl,
+    write(Msg4), log(Msg4),
+    write(A), log(A), log("\n"), nl,
+    write(Msg5), log(Msg5), log("\n\n"), nl, nl,
+    read(Num), log(Num), log("\n"), nl,
+    operacao(Num, W, A, HA, HL, Res).
 
 
 operacao(1, W, A, HA, HL, W).
 operacao(2, W, A, HA, HL, A).
 operacao(3, W, A, HA, HL, (HA, HL)).
 operacao(_, W, A, HA, HL, Res) :-
-    write("Entrada Inválida. Insira outro valor."), nl,
+    Msg = "Entrada Inválida. Insira outro valor.",
+    write(Msg), log(Msg), log("\n"), nl,
     mensagem_loja(W, A, HA, HL, Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,7 +131,9 @@ batalha(HA, HL, EA, EL, Coin, Res) :-
 
 fluxo_batalha(HA, HL, EL, EA, Coin, Round) :-
     monstro(Nome),
-    write("Você encontrou um "), write(Nome), nl,
+    Msg = "Você encontrou um ",
+    write(Msg), log(Msg),
+    write(Nome), log(Nome), log("\n"), nl,
     atualizar_inimigo(EL, EA, NewEL, NewEA),
     batalha(HA, HL, NewEA, NewEL, Coin, Res),
     result(Res, HA, HL, NewEA, NewEL, Round).
@@ -132,22 +143,27 @@ result(Res, HA, HL, EA, EL, Round) :-
 	perdeu.
 
 ganhou(HA,HL,EA, EL, Round) :- 
-    write("Parabens você ganhou a luta! Você venceu o Round "),
+    Msg = "Parabens você ganhou a luta! Você venceu o Round ", 
+    write(Msg), log(Msg),
     soma(1, Round, ProxRound),
-    write(Round), nl, nl,
+    write(Round), log(Round), log("\n\n"), nl, nl,
     inicio_batalha(HA, HL, EA, EL, ProxRound).
 
 perdeu :- 
-    writeln("Não foi dessa vez :("),
+    Msg = "Não foi dessa vez :(",
+    writeln(Msg),
+    log(Msg), log("\n"),
     main.
 
 inicio_batalha(HA, HL, EA, EL, 6):- 
-    writeln("Você venceu 5 batalhas consecutivas! Vá para a loja melhorar seus equipamentos"),
+    Msg = "Você venceu 5 batalhas consecutivas! Vá para a loja melhorar seus equipamentos",
+    writeln(Msg), log(Msg), log("\n"),
     iniciar_loja(HA, HL, NewHA, NewHL),
     inicio_batalha(NewHA, NewHL, EA, EL, 0).
 
 inicio_batalha(HA, HL, EA, EL, Round) :-
-    writeln("A batalha vai começar!"),
+    Msg = "A batalha vai começar!",
+    writeln(Msg), log(Msg), log("\n"),
     coin(Res),
     fluxo_batalha(HA, HL, EA,EL, Res, Round).
 
@@ -158,10 +174,14 @@ jogo :-
     inicio_batalha(HA, HL, EA, EL, 0).
 
 seleciona_dificuldade(X) :-
-	write("Selecione a dificuldade:"), nl,
-	write("[1] Fácil"), nl,
-    write("[2] Médio"), nl,
-    write("[3] Difícil"), nl,
+    M1 = "Selecione a dificuldade:",
+    M2 = "[1] Fácil",
+    M3 = "[2] Médio",
+    M4 = "[3] Difícil",
+	write(M1), log(M1), log("\n"), nl,
+	write(M2), log(M2), log("\n"), nl,
+    write(M3), log(M3), log("\n"), nl,
+    write(M4), log(M4), log("\n"), nl,
     read(X), nl.
 
 gerar_inimigo_base(EA, EL) :- 
@@ -173,14 +193,18 @@ ck(Res) :-
     msg_ck(Res).
 
 msg_ck(1) :- 
-    writeln("O resultado foi cara! :)").
+    Msg = "O resultado foi cara! :)",
+    writeln(Msg), log(Msg), log("\n").
 
 msg_ck(0) :- 
-    writeln("O resultado foi coroa! :(").
+    Msg = "O resultado foi coroa! :(",
+    writeln(Msg), log(Msg), log("\n").
 
 coin(Resultado) :- 
-    write("Vamos decidir quem começa em um Cara ou Coroa"), nl,
-    write("Cara você ganha, Coroa você perde"), nl,
+    M1 = "Vamos decidir quem começa em um Cara ou Coroa",
+    M2 = "Cara você ganha, Coroa você perde",
+    write(M1), log(M1), log("\n"), nl,
+    write(M2), log(M2), log("\n"), nl,
     ck(Resultado).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,9 +214,12 @@ coin(Resultado) :-
 sair.
 
 ver_instrucoes :- 
-	writeln("O jogo se dá através de sucessivas lutas contra monstros!"), 
-	writeln("A cada 5 vitórias você poderá ir para loja ficar mais forte!"),
-	writeln("Dê o seu melhor para obter o maior numero de pontos possíveis!"), nl,
+    M1 = "O jogo se dá através de sucessivas lutas contra monstros!",
+    M2 = "A cada 5 vitórias você poderá ir para loja ficar mais forte!",
+    M3 = "Dê o seu melhor para obter o maior numero de pontos possíveis!",
+	writeln(M1), log(M1), log("\n"),
+	writeln(M2), log(M2), log("\n"),
+	writeln(M3), log(M3), log("\n\n"), nl,
 	main.
 
 redireciona(1) :- jogo.
@@ -200,15 +227,36 @@ redireciona(2) :- ver_instrucoes.
 redireciona(3) :- ver_recordes.
 redireciona(4) :- sair.
 redireciona(_) :- 
-    write("Entrada Inválida. Insira outro valor."), nl,
+    M1 = "Entrada Inválida. Insira outro valor.",
+    write(M1), log(M1), log("\n"), nl,
     mensagem_batalha().
 
-mensagem_inicial :- nl, write("Bem Vindo ao XIAQ"), nl.
-mensagem_batalha :- 
-    write("[1] Iniciar batalha"), nl,
-    write("[2] Ver Instruções"), nl,
-    write("[3] Visualizar Recordes"), nl,
-    write("[4] Sair"), nl, nl,
-    read(Entrada), nl, redireciona(Entrada).
+mensagem_inicial() :-
+    nl, M1 = "\nBem Vindo ao XIAQ",
+    write(M1), log(M1), log("\n"), nl.
 
-main :- mensagem_inicial, mensagem_batalha.
+mensagem_batalha() :- 
+    M1 = "[1] Iniciar batalha",
+    M2 = "[2] Ver Instruções",
+    M3 = "[3] Visualizar Recordes",
+    M4 = "[4] Sair",
+    write(M1), log(M1), log("\n"), nl,
+    write(M2), log(M2), log("\n"), nl,
+    write(M3), log(M3), log("\n"), nl,
+    write(M4), log(M4), log("\n\n"), nl, nl,
+    read(Entrada), log(Entrada), log("\n"), nl, redireciona(Entrada).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                LOG                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+log(Text) :-
+	open('log.txt', append, Stream),
+	write(Stream, Text),
+	close(Stream).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                MAIN                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+main :- mensagem_inicial(), mensagem_batalha().
