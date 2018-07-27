@@ -1,6 +1,6 @@
 :- use_module(library(random)).
 
-:- initialization(main).
+%:- initialization(main).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                LOJA                                %
@@ -19,12 +19,8 @@ mensagem_loja(W, A, HA, HL, Res) :-
     write("[1] Arma     "), write(W), nl,
     write("[2] Armadura "), write(A), nl,
     write("[3] Não vou comprar nada"), nl, nl,
-    ler_inteiro(Num), nl, operacao(Num, W, A, HA, HL, Res).
+    read(Num), nl, operacao(Num, W, A, HA, HL, Res).
 
-ler_inteiro(X) :-
-    read_line_to_codes(user_input, Codes),
-    string_to_atom(Codes, Atom),
-    atom_number(Atom, X).
 
 operacao(1, W, A, HA, HL, W).
 operacao(2, W, A, HA, HL, A).
@@ -54,8 +50,36 @@ gerar_item(STR, HP, I) :-
     I = (NewSTR, NewHP).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                               GERADOR                              %
+%                             GERADOR MONSTRO                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+getItem([H|T], 0, H). 
+getItem([H|T], Numero, Item) :-  K is Numero - 1, getItem(T, K, Item).
+
+
+
+monstro(Name) :- nomeMonstro(X),alteradorMonstro(Y),string_concat(X,Y,Name).
+
+nomeMonstro(Nome) :- Monstros = ['Ladrão','Dragão','Golem','Gosma', 'Vampiro','Lobisomen','Rato gigante'],
+ random(0,5,X), getItem(Monstros, X, Nome),!. 
+
+alteradorMonstro(Alterer) :- Alteradores = [' Pacifista',' Burro',' Cego',' Imaginário',' Sem Pernas', ' Invisivel', ' Gigantesco',
+    ' de 3 cabeças', ' Aterrorizante',' Cabeludo',' Rochoso',' Assassino', ''], random(0,11,X), getItem(Alteradores,X,Alterer),!. 
+
+aumentaAtributo(X,Y) :- Y is 1.5*X.
+
+gerar_inimigo(HP, ATQ) :-
+    gera_hp(HP), gera_atq(ATQ).
+
+
+
+gera_hp(HP) :-
+    HP is 15.
+
+gera_atq(ATQ) :-
+    ATQ is 15.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,42 +96,96 @@ batalha(HA, HL, EA, EL, Coin, Res) :- EL / HA > HL / EA -> Res is 0;
     EL / HA < HL / EA -> Res is 1;
     Res is Coin.
 
-fluxo_batalha(HA, HL, Coin, Round, Exp) :-
-    gerar_inimigo(Exp).
 
-inicio_batalha() :-
-    gerar_heroi(HA, HL),
-    coin(Res), fluxo_batalha(HA, HL, Res, 0, 0).
 
-valida_CK("Cara", 1, 1).
-valida_CK("Coroa", 0, 1).
-valida_CK(_, _, 0).
+
+fluxo_batalha(HA, HL, Coin, Round) :-
+    monstro(Nome),
+    write("Você encontrou um "),write(Nome),nl,
+    gerar_inimigo(EL,EA),
+    batalha(HA,HL,EA,EL,Coin,Res),
+    result(Res,HA,HL,Round).
+
+
+result(Res,HA,HL,Round) :- Res = 1 -> ganhou(HA,HL,Round);perdeu.
+
+
+ganhou(HA,HL,Round) :- 
+    write("Parabens você ganhou a luta! Você venceu o Round "),
+    soma(1,Round,ProxRound),
+    write(Round),nl,
+    inicio_batalha(HA,HL,ProxRound).
+
+perdeu :- 
+    writeln("Não foi dessa vez :("),
+     mensagem_inicial(), mensagem_batalha().
+
+
+
+inicio_batalha(HA,HL,6):- 
+    writeln("Você venceu 5 batalhas consecutivas! Vá para a loja melhorar seus equipamentos"),
+    iniciar_loja(HA,HL,NewHA,NewHL),
+    inicio_batalha(NewHA,NewHL,0).
+
+
+inicio_batalha(HA,HL,Round) :-
+    writeln("A batalha vai começar!"),
+    coin(Res),
+    fluxo_batalha(HA, HL, Res, Round).
+
+
+jogo :-
+    gerar_heroi(HA,HL),
+    inicio_batalha(HA,HL,0).
+
+
+
+
+
+ck(Res) :-
+    random(0,2,Res),
+    msg_ck(Res).
+
+msg_ck(1) :- 
+    writeln("O resultado foi cara! :)").
+
+msg_ck(0) :- 
+    writeln("O resultado foi coroa! :(").
+
+
 
 coin(Resultado) :- 
-    write("Jogue Cara ou Coroa para decidir quem inicia atacando."), nl,
-    write("Escolha 'Cara' ou 'Coroa':"), nl,
-    write("PS: Se você inserir algum valor inválido, perde."), nl,
-    read(Escolha), nl, valida_CK(Escolha, Resultado).
+    write("Vamos decidir quem começa em um Cara ou Coroa"), nl,
+    write("Cara você ganha, Coroa você perde"),nl,
+    ck(Resultado).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               HEROI                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+gerar_heroi(HA,HL):-
+HA is 25, HL is 25.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                MENU                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-redireciona(1) :- iniciar_batalhas().
+redireciona(1) :- jogo.
 redireciona(2) :- ver_instrucoes().
 redireciona(3) :- ver_recordes().
 redireciona(4) :- sair().
 redireciona(_) :- 
+
     write("Entrada Inválida. Insira outro valor."), nl,
     mensagem_batalha().
 
-mensagem_inicial() :- write("Bem Vindo ao XIAQ"), nl.
-mensagem_batalha() :- 
+mensagem_inicial :- write("Bem Vindo ao XIAQ"), nl.
+mensagem_batalha :- 
     write("[1] Iniciar batalha"), nl,
     write("[2] Ver Instruções"), nl,
     write("[3] Visualizar Recordes"), nl,
     write("[4] Sair"), nl, nl,
     read(Entrada), nl, redireciona(Entrada).
 
-main :- mensagem_inicial(), mensagem_batalha().
+main :- mensagem_inicial, mensagem_batalha.
