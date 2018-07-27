@@ -160,9 +160,9 @@ perdeu(EL, EA, K) :-
     M2 = "O monstro mais forte que você derrotou tinha: HP: ",
     M3 = " Ataque: ",
     writeln(Msg), log(Msg), log("\n"),
-    writeln(M2), write(EL),
+    write(M2), write(EL),
     log(M2), log(EL),
-    write(M3), write(EA),
+    write(M3), write(EA), nl,
     log(M3), log(EA), log("\n"),
     inserePontuacao(EL, K, Result),
     mensagem_batalha(Result).
