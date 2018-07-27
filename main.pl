@@ -9,32 +9,29 @@
 iniciar_loja(HA, HL, NewHA, NewHL) :-
     gerar_item(HA, HL, W),
     gerar_item(HA, HL, A),
-    gerar_item(HA, HL, I),
-    mensagem_loja(W, A, I, Res),
+    mensagem_loja(W, A, HA, HL, Res),
     (X, Y) = Res,
     NewHA is X, NewHL is Y.
 
-mensagem_loja(W, A, I, Res) :- 
+mensagem_loja(W, A, HA, HL, Res) :- 
     write("Bem Vindo à Loja"), nl,
     write("Qual item você deseja comprar?"), nl,
     write("[1] Arma     "), write(W), nl,
     write("[2] Armadura "), write(A), nl,
-    write("[3] Arma     "), write(I), nl,
-    write("[4] Não vou comprar nada"), nl, nl,
-    ler_inteiro(Num), nl, operacao(Num, W, A, I, Res).
+    write("[3] Não vou comprar nada"), nl, nl,
+    ler_inteiro(Num), nl, operacao(Num, W, A, HA, HL, Res).
 
 ler_inteiro(X) :-
     read_line_to_codes(user_input, Codes),
     string_to_atom(Codes, Atom),
     atom_number(Atom, X).
 
-operacao(1, W, A, I, W).
-operacao(2, W, A, I, A).
-operacao(3, W, A, I, I).
-operacao(4, W, A, I, (0,0)).
-operacao(_, W, A, I, Res) :-
+operacao(1, W, A, HA, HL, W).
+operacao(2, W, A, HA, HL, A).
+operacao(3, W, A, HA, HL, (HA, HL)).
+operacao(_, W, A, HA, HL, Res) :-
     write("Entrada Inválida. Insira outro valor."), nl,
-    mensagem_loja(W, A, I, Res).
+    mensagem_loja(W, A, HA, HL, Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RANKING                              %
